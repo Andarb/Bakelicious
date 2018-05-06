@@ -1,20 +1,18 @@
 package com.github.andarb.bakelicious;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.github.andarb.bakelicious.adapters.StepAdapter;
+import com.github.andarb.bakelicious.data.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,7 +56,8 @@ public class StepListFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
 
         // TODO setup proper adapter values
-        final StepAdapter stepAdapter = new StepAdapter(context, mCallback);
+        Recipe recipe = getActivity().getIntent().getParcelableExtra(InstructionsFragmentActivity.RECIPE_EXTRA);
+        StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
         mRecyclerView.setAdapter(stepAdapter);
 
         return view;

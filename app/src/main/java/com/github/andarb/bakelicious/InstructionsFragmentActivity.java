@@ -1,16 +1,13 @@
 package com.github.andarb.bakelicious;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.andarb.bakelicious.data.Recipe;
+
 import butterknife.BindBool;
-import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -19,11 +16,13 @@ import butterknife.ButterKnife;
  */
 public class InstructionsFragmentActivity extends FragmentActivity
         implements StepListFragment.OnStepSelectedListener {
-    // Clicked recipe in MainActivity
+
     public final static String RECIPE_EXTRA = "recipe";
 
     @BindBool(R.bool.isTablet)
     boolean mIsTablet;
+
+    private Recipe mRecipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +30,10 @@ public class InstructionsFragmentActivity extends FragmentActivity
         setContentView(R.layout.instructions);
         ButterKnife.bind(this);
 
-        //TODO get recipe clicked from MainActivity
-        int recipe = getIntent().getIntExtra(RECIPE_EXTRA, 0);
+        // Get the clicked (in MainActivity) recipe
+        mRecipe = getIntent().getParcelableExtra(RECIPE_EXTRA);
+
+        setTitle(mRecipe.getName());
 
         // If we are on a phone, then we will need to add the first fragment
         if (!mIsTablet) {
@@ -53,9 +54,9 @@ public class InstructionsFragmentActivity extends FragmentActivity
             //TODO update StepDetailsFragment with new information. remove toast
             Toast.makeText(this, "tablet test position:" + position, Toast.LENGTH_SHORT).show();
 
-            StepListFragment stepListFragment = (StepListFragment)
-                    getSupportFragmentManager().findFragmentById(R.id.step_list_fragment);
-            // stepListFragment.update(newdata);
+            StepDetailsFragment stepDetailsFragment = (StepDetailsFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.step_details_fragment);
+            // stepDetailsFragment.update(newdata);
         } else {
             //TODO replace StepListFragment with StepDetailsFragment. remove toast
             Toast.makeText(this, "phone test position:" + position, Toast.LENGTH_SHORT).show();
