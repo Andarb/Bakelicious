@@ -7,9 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.github.andarb.bakelicious.R;
 import com.github.andarb.bakelicious.StepListFragment;
+import com.github.andarb.bakelicious.data.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,10 +21,13 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
     private final Context mContext;
     private StepListFragment.OnStepSelectedListener mCallback;
+    private Recipe mRecipe;
 
-    public StepAdapter(Context context, StepListFragment.OnStepSelectedListener callback) {
+    public StepAdapter(Context context, StepListFragment.OnStepSelectedListener callback,
+                       Recipe recipe) {
         mContext = context;
         mCallback = callback;
+        mRecipe = recipe;
     }
 
 
@@ -59,7 +62,7 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
     @Override
     public void onBindViewHolder(StepAdapter.StepViewHolder holder, int position) {
         // TODO bind views
-        holder.stepNameTV.setText(position + ". Test step instruction.");
+        holder.stepNameTV.setText(position + mRecipe.getSteps().get(position).getShortDescription());
 
     }
 

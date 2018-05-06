@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">Bakelicious</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--Error messages when retrieving recipes-->
+    <string name="error_server">Unable to establish connection. Server maybe down.\n\n Please try again later.</string>
+    <string name="error_server_status">HTTP Status code: </string>
+    <string name="error_internet">Unable to establish connection.\n\n Please check your
+        Cell/Wi-Fi signal, and try again.</string>
+    <string name="error_empty_list">List of recipes appears to be empty.\n\n Please try again later.</string>
+
+    <!--a11y text-->
+    <string name="a11y_recipe_photo">Photo of the dish.</string>
 </resources>
