@@ -6,6 +6,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Test Step Detailed Information"/>
+        android:text="EXOPLAYER SPACE HERE" />
+
+    <TextView
+        android:id="@+id/step_description_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
