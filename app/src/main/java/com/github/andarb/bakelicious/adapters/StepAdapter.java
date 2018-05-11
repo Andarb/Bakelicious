@@ -61,14 +61,11 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
     @Override
     public void onBindViewHolder(StepAdapter.StepViewHolder holder, int position) {
-        // TODO bind views
         holder.stepNameTV.setText(position + mRecipe.getSteps().get(position).getShortDescription());
-
     }
 
     @Override
     public int getItemCount() {
-        // TODO get appropriate size
-        return 10;
+        return mRecipe.getSteps().size();
     }
 }

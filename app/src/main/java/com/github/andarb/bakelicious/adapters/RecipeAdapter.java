@@ -54,8 +54,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             int position = getAdapterPosition();
 
             Intent instructionsIntent = new Intent(mContext, InstructionsFragmentActivity.class);
-            instructionsIntent.putExtra(InstructionsFragmentActivity.RECIPE_EXTRA, position);
-            // TODO pass extras that you need
+            instructionsIntent.putExtra(InstructionsFragmentActivity.RECIPE_EXTRA,
+                    mRecipes.get(position));
 
             mContext.startActivity(instructionsIntent);
         }

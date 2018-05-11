@@ -10,9 +10,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.andarb.bakelicious.adapters.StepAdapter;
+import com.github.andarb.bakelicious.data.Ingredient;
 import com.github.andarb.bakelicious.data.Recipe;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,9 +36,10 @@ public class StepListFragment extends Fragment {
     }
     OnStepSelectedListener mCallback;
 
-
     @BindView(R.id.steps_recycler_view)
     RecyclerView mRecyclerView;
+    @BindView(R.id.ingredients_text_view)
+    TextView mIngredientsTV;
 
     private Unbinder mButterknifeUnbinder;
 
@@ -43,6 +48,16 @@ public class StepListFragment extends Fragment {
     public StepListFragment() {
     }
 
+    // Create a new instance of the fragment, and pass it a recipe
+    public static StepListFragment newInstance(Recipe recipe) {
+        StepListFragment f = new StepListFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(InstructionsFragmentActivity.RECIPE_EXTRA, recipe);
+        f.setArguments(args);
+
+        return f;
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -51,16 +66,40 @@ public class StepListFragment extends Fragment {
         View view = inflater.inflate(R.layout.step_list, container, false);
         mButterknifeUnbinder = ButterKnife.bind(this, view);
 
+        // Retrieve recipe from our activity
+        Recipe recipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
+
+        // Parse and set a list of ingredients
+        String ingredients = parseIngredients(recipe.getIngredients());
+        mIngredientsTV.setText(ingredients);
+
+        // Set up the adapter and recyclerview to display recipe steps
+        StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
+
         mRecyclerView.setLayoutManager(new LinearLayoutManager
                 (context, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setHasFixedSize(true);
-
-        // TODO setup proper adapter values
-        Recipe recipe = getActivity().getIntent().getParcelableExtra(InstructionsFragmentActivity.RECIPE_EXTRA);
-        StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
         mRecyclerView.setAdapter(stepAdapter);
 
         return view;
+    }
+
+    private String parseIngredients(List<Ingredient> ingredients) {
+        StringBuilder sB = new StringBuilder();
+        for (int i = 0; i < ingredients.size(); i++) {
+            float quantity = ingredients.get(i).getQuantity();
+            String measure = ingredients.get(i).getMeasure();
+            String ingredient = ingredients.get(i).getIngredient();
+
+            sB.append(quantity);
+            sB.append(" ");
+            sB.append(measure);
+            sB.append(" ");
+            sB.append(ingredient);
+            sB.append("\n");
+        }
+
+        return sB.toString().toLowerCase();
     }
 
     // This ensures InstructionsFragmentActivity has implemented OnStepSelectedListener interface
