@@ -1,7 +1,12 @@
 package com.github.andarb.bakelicious;
 
 
+import android.app.Activity;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -15,6 +20,7 @@ import android.widget.TextView;
 import com.github.andarb.bakelicious.adapters.StepAdapter;
 import com.github.andarb.bakelicious.data.Ingredient;
 import com.github.andarb.bakelicious.data.Recipe;
+import com.github.andarb.bakelicious.widget.IngredientProvider;
 
 import java.util.List;
 
@@ -69,9 +75,11 @@ public class StepListFragment extends Fragment {
         // Retrieve recipe from our activity
         Recipe recipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
 
-        // Parse and set a list of ingredients
+        // Parse a list of ingredients, then set it to be displayed and save a copy for the widget
         String ingredients = parseIngredients(recipe.getIngredients());
         mIngredientsTV.setText(ingredients);
+        saveIngredients(recipe.getName(), ingredients);
+
 
         // Set up the adapter and recyclerview to display recipe steps
         StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
@@ -84,6 +92,7 @@ public class StepListFragment extends Fragment {
         return view;
     }
 
+    // Parse the ingredients to make them more readable
     private String parseIngredients(List<Ingredient> ingredients) {
         StringBuilder sB = new StringBuilder();
         for (int i = 0; i < ingredients.size(); i++) {
@@ -100,6 +109,24 @@ public class StepListFragment extends Fragment {
         }
 
         return sB.toString().toLowerCase();
+    }
+
+    // Save recipe name and its ingredients, and update the widget if necessary
+    private void saveIngredients(String recipe, String ingredients) {
+        Activity activity = getActivity();
+        SharedPreferences sharedPref = activity.getSharedPreferences(
+                activity.getString(R.string.preferences_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.preferences_recipe_key), recipe);
+        editor.putString(getString(R.string.preferences_ingredients_key), ingredients);
+        editor.commit();
+
+        Intent intent = new Intent(activity, IngredientProvider.class);
+        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        int appWidgetIds[] = AppWidgetManager.getInstance(activity.getApplication())
+                .getAppWidgetIds(new ComponentName(activity.getApplication(), IngredientProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
+        activity.sendBroadcast(intent);
     }
 
     // This ensures InstructionsFragmentActivity has implemented OnStepSelectedListener interface
