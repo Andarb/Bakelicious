@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     //TODO replace error Toasts with a textview
                     List<Recipe> recipes = response.body();
                     if (recipes == null) {
-                        Toast.makeText(MainActivity.this, R.string.error_empty_list,
+                        Toast.makeText(MainActivity.this, R.string.error_empty_recipe_list,
                                 Toast.LENGTH_LONG).show();
                         return;
                     }

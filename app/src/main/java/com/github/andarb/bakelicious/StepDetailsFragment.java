@@ -1,9 +1,9 @@
 package com.github.andarb.bakelicious;
 
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,7 +21,6 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -68,18 +67,6 @@ public class StepDetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.step_details, container, false);
         mButterknifeUnbinder = ButterKnife.bind(this, view);
 
-        // 1. Create a default TrackSelector
-        Handler mainHandler = new Handler();
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        // 2. Create the player and set its view
-        mPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-        mPlayerView.setPlayer(mPlayer);
-
         // Retrieve recipe from our activity, and populate details
         mRecipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
         int stepNr = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
@@ -90,17 +77,45 @@ public class StepDetailsFragment extends Fragment {
 
     public void updateDetails(int step) {
         String videoUrl = mRecipe.getSteps().get(step).getVideoURL();
-        if (!videoUrl.isEmpty()) {
-            // Prepare media player source
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                    Util.getUserAgent(getActivity(), getString(R.string.app_name)), bandwidthMeter);
-            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(videoUrl));
-            mPlayer.prepare(videoSource);
+        if (videoUrl.isEmpty()) {
+            mPlayerView.setVisibility(View.GONE);
+            releasePlayer();
+        } else {
+            initializePlayer(getActivity(), Uri.parse(videoUrl));
         }
 
         stepDescriptionTV.setText(mRecipe.getSteps().get(step).getDescription());
+    }
+
+    private void initializePlayer(Context context, Uri videoUri) {
+        mPlayerView.setVisibility(View.VISIBLE);
+
+        // Create a default TrackSelector
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        // Create the player and set its view
+        mPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        mPlayerView.setPlayer(mPlayer);
+
+        // Prepare media player source, and start playing the video
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, getString(R.string.app_name)), bandwidthMeter);
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(videoUri);
+        mPlayer.prepare(videoSource);
+        mPlayer.setPlayWhenReady(true);
+    }
+
+    private void releasePlayer() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 
     // Required unbind when using Butterknife with Fragments
@@ -108,6 +123,7 @@ public class StepDetailsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
 
+        releasePlayer();
         mButterknifeUnbinder.unbind();
     }
 }
