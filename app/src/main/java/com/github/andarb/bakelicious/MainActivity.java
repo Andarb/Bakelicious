@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.github.andarb.bakelicious.adapters.RecipeAdapter;
 import com.github.andarb.bakelicious.data.Recipe;
@@ -15,6 +17,7 @@ import java.util.List;
 import butterknife.BindBool;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,6 +30,12 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.recipes_recycler_view)
     RecyclerView mRecyclerView;
+    @BindView(R.id.recipes_progress_bar)
+    ProgressBar mProgressBar;
+    @BindView(R.id.error_layout)
+    View mErrorLayout;
+    @BindView(R.id.error_message_text_view)
+    TextView mErrorTV;
     @BindBool(R.bool.isTablet)
     boolean mIsTablet;
 
@@ -54,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     /* Download and parse a list of recipes using Retrofit */
     public void downloadRecipes() {
+        mProgressBar.setVisibility(View.VISIBLE);
         Call<List<Recipe>> getCall = RetrofitClient.getRecipes();
 
         getCall.enqueue(new Callback<List<Recipe>>() {
@@ -61,29 +71,43 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<Recipe>> call,
                                    Response<List<Recipe>> response) {
                 if (response.isSuccessful()) {
+                    hideError();
 
-                    //TODO replace error Toasts with a textview
                     List<Recipe> recipes = response.body();
                     if (recipes == null) {
-                        Toast.makeText(MainActivity.this, R.string.error_empty_recipe_list,
-                                Toast.LENGTH_LONG).show();
+                        showError(getString(R.string.error_empty_recipe_list));
                         return;
                     }
 
                     RecipeAdapter recipeAdapter = new RecipeAdapter(MainActivity.this, recipes);
                     mRecyclerView.setAdapter(recipeAdapter);
                 } else {
-                    Toast.makeText(MainActivity.this,
-                            R.string.error_server_status + response.code(), Toast.LENGTH_LONG)
-                            .show();
+                    showError(getString(R.string.error_server_status) + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Recipe>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, R.string.error_internet,
-                        Toast.LENGTH_LONG).show();
+                showError(getString(R.string.error_internet));
             }
         });
+    }
+
+    private void showError(String error) {
+        mProgressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+        mErrorTV.setText(error);
+        mErrorLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void hideError() {
+        mProgressBar.setVisibility(View.GONE);
+        mErrorLayout.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.error_retry_button)
+    public void onRetryClicked() {
+        downloadRecipes();
     }
 }

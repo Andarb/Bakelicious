@@ -1,13 +1,16 @@
 <resources>
     <string name="app_name">Bakelicious</string>
 
-    <!--Error messages when retrieving recipes-->
+    <!--Error messages when retrieving recipes/ingredients-->
     <string name="error_server">Unable to establish connection. Server maybe down.\n\n Please try again later.</string>
-    <string name="error_server_status">HTTP Status code: </string>
+    <string name="error_server_status">Unable to establish connection.\n\n HTTP Status code: </string>
     <string name="error_internet">Unable to establish connection.\n\n Please check your
         Cell/Wi-Fi signal, and try again.</string>
     <string name="error_empty_recipe_list">List of recipes appears to be empty.\n\n Please try again later.</string>
     <string name="error_empty_ingredient_list">List of ingredients appears to be empty. Please try again later.</string>
+
+    <!--Error message button-->
+    <string name="error_retry_button">Retry</string>
 
     <!--a11y text-->
     <string name="a11y_recipe_photo">Photo of the dish.</string>

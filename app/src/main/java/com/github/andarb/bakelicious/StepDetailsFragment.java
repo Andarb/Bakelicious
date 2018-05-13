@@ -68,7 +68,11 @@ public class StepDetailsFragment extends Fragment {
         mButterknifeUnbinder = ButterKnife.bind(this, view);
 
         // Retrieve recipe from our activity, and populate details
-        mRecipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
+        if (savedInstanceState == null) {
+            mRecipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
+        } else {
+            mRecipe = savedInstanceState.getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
+        }
         int stepNr = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
         updateDetails(stepNr);
 
@@ -116,6 +120,13 @@ public class StepDetailsFragment extends Fragment {
             mPlayer.release();
             mPlayer = null;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(InstructionsFragmentActivity.RECIPE_EXTRA, mRecipe);
     }
 
     // Required unbind when using Butterknife with Fragments
