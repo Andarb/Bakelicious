@@ -2,7 +2,6 @@ package com.github.andarb.bakelicious;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 
 import com.github.andarb.bakelicious.data.Recipe;
 
@@ -31,21 +30,31 @@ public class InstructionsFragmentActivity extends FragmentActivity
         setContentView(R.layout.instructions);
         ButterKnife.bind(this);
 
-        // There is no need to add the fragments again, if activity is being restored
-        if (savedInstanceState != null) return;
+        if (savedInstanceState != null) {
+            // FragmentManager will recreate fragments automatically, so we just need to make sure
+            // we restore Activity members that are needed for fragment operation, and then return;
+            mRecipe = savedInstanceState.getParcelable(RECIPE_EXTRA);
+            if (mIsTablet) {
+                mStepDetailsFragment = (StepDetailsFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.details_fragment_container);
+            }
 
-        // Get the clicked (in MainActivity) recipe
-        mRecipe = getIntent().getParcelableExtra(RECIPE_EXTRA);
+            return;
+        } else {
+            // Get the clicked recipe (from MainActivity)
+            mRecipe = getIntent().getParcelableExtra(RECIPE_EXTRA);
+        }
 
         // Set action bar title to be the name of the recipe
         setTitle(mRecipe.getName());
 
-        // Create and add a fragment with a list of recipe steps
+        // Launch a list of recipe steps on both a phone or a tablet
         StepListFragment stepListFragment = StepListFragment.newInstance(mRecipe);
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.list_fragment_container, stepListFragment).commit();
+                .add(R.id.list_fragment_container, stepListFragment)
+                .commit();
 
-        // If on a tablet, add a second fragment for the recipe step details
+        // If on a tablet, also add a second fragment for the step details
         if (mIsTablet) {
             mStepDetailsFragment = StepDetailsFragment.newInstance(mRecipe, 0);
             getSupportFragmentManager().beginTransaction()
@@ -53,19 +62,24 @@ public class InstructionsFragmentActivity extends FragmentActivity
         }
     }
 
-
     // When a recipe step in StepListFragment is clicked, update or replace StepDetailsFragment
     @Override
     public void onStepSelected(int position) {
-
         if (mIsTablet) {
             mStepDetailsFragment.updateDetails(position);
         } else {
             StepDetailsFragment stepDetailsFragment = StepDetailsFragment.newInstance(mRecipe, position);
-
-            FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-            fragTransaction.replace(R.id.list_fragment_container, stepDetailsFragment).
-                    addToBackStack(null).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.list_fragment_container, stepDetailsFragment)
+                    .addToBackStack(null)
+                    .commit();
         }
+    }
+
+    // Save recipe details, so we don't need to do another network request for them
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(RECIPE_EXTRA, mRecipe);
+        super.onSaveInstanceState(outState);
     }
 }

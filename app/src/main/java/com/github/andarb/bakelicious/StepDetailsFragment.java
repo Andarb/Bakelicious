@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ public class StepDetailsFragment extends Fragment {
     PlayerView mPlayerView;
 
     private Recipe mRecipe;
+    private int mRecipeStep;
     private SimpleExoPlayer mPlayer;
     private Unbinder mButterknifeUnbinder;
 
@@ -61,26 +63,39 @@ public class StepDetailsFragment extends Fragment {
         return f;
     }
 
+    // Inflate the layout and bind any butterknife views
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.step_details, container, false);
         mButterknifeUnbinder = ButterKnife.bind(this, view);
 
-        // Retrieve recipe from our activity, and populate details
-        if (savedInstanceState == null) {
-            mRecipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
-        } else {
-            mRecipe = savedInstanceState.getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
-        }
-        int stepNr = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
-        updateDetails(stepNr);
-
         return view;
     }
 
+    // Retrieve recipe and recipe step number from host activity (or a saved instance)
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mRecipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
+
+        if (savedInstanceState != null) {
+            // Since both fragments are visible on a tablet, the recipe step must be intialized to 0
+            // on fragment creation. When fragment is recreated we need to restore the correct step.
+            mRecipeStep = savedInstanceState.getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+        } else {
+            mRecipeStep = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+        }
+
+        updateDetails(mRecipeStep);
+    }
+
+    // Set the appropriate views of a detailed recipe step
     public void updateDetails(int step) {
-        String videoUrl = mRecipe.getSteps().get(step).getVideoURL();
+        mRecipeStep = step;
+
+        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL();
         if (videoUrl.isEmpty()) {
             mPlayerView.setVisibility(View.GONE);
             releasePlayer();
@@ -88,9 +103,10 @@ public class StepDetailsFragment extends Fragment {
             initializePlayer(getActivity(), Uri.parse(videoUrl));
         }
 
-        stepDescriptionTV.setText(mRecipe.getSteps().get(step).getDescription());
+        stepDescriptionTV.setText(mRecipe.getSteps().get(mRecipeStep).getDescription());
     }
 
+    // Setup ExoPlayer to play a video
     private void initializePlayer(Context context, Uri videoUri) {
         mPlayerView.setVisibility(View.VISIBLE);
 
@@ -114,19 +130,11 @@ public class StepDetailsFragment extends Fragment {
         mPlayer.setPlayWhenReady(true);
     }
 
-    private void releasePlayer() {
-        if (mPlayer != null) {
-            mPlayer.stop();
-            mPlayer.release();
-            mPlayer = null;
-        }
-    }
-
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+        outState.putInt(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
 
-        outState.putParcelable(InstructionsFragmentActivity.RECIPE_EXTRA, mRecipe);
+        super.onSaveInstanceState(outState);
     }
 
     // Required unbind when using Butterknife with Fragments
@@ -136,5 +144,14 @@ public class StepDetailsFragment extends Fragment {
 
         releasePlayer();
         mButterknifeUnbinder.unbind();
+    }
+
+    // Release ExoPlayer resources
+    private void releasePlayer() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
     }
 }
