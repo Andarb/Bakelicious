@@ -75,11 +75,10 @@ public class StepListFragment extends Fragment {
         // Retrieve recipe from our activity
         Recipe recipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
 
-        // Parse a list of ingredients, then set it to be displayed and save a copy for the widget
+        // Parse a list of ingredients. Then, set it to be displayed, and save a copy for the widget
         String ingredients = parseIngredients(recipe.getIngredients());
         mIngredientsTV.setText(ingredients);
         saveIngredients(recipe.getName(), ingredients);
-
 
         // Set up the adapter and recyclerview to display recipe steps
         StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
@@ -111,7 +110,7 @@ public class StepListFragment extends Fragment {
         return sB.toString().toLowerCase();
     }
 
-    // Save recipe name and its ingredients, and update the widget if necessary
+    // Save recipe name and its ingredients, and try to update the widget
     private void saveIngredients(String recipe, String ingredients) {
         Activity activity = getActivity();
         SharedPreferences sharedPref = activity.getSharedPreferences(
