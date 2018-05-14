@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.andarb.bakelicious.data.Recipe;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -37,6 +38,8 @@ import butterknife.Unbinder;
  */
 public class StepDetailsFragment extends Fragment {
 
+    private final static String PLAYER_POSITION = "exoplayer_seek";
+
     @BindView(R.id.step_description_text_view)
     TextView stepDescriptionTV;
     @BindView(R.id.exoplayer_view)
@@ -45,6 +48,7 @@ public class StepDetailsFragment extends Fragment {
     private Recipe mRecipe;
     private int mRecipeStep;
     private SimpleExoPlayer mPlayer;
+    private long mPlayerPosition;
     private Unbinder mButterknifeUnbinder;
 
     // Required empty public constructor
@@ -84,14 +88,16 @@ public class StepDetailsFragment extends Fragment {
             // Since both fragments are visible on a tablet, the recipe step must be intialized to 0
             // on fragment creation. When fragment is recreated we need to restore the correct step.
             mRecipeStep = savedInstanceState.getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+            mPlayerPosition = savedInstanceState.getLong(PLAYER_POSITION, C.TIME_UNSET);
         } else {
             mRecipeStep = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+            mPlayerPosition = C.TIME_UNSET; // ExoPlayer constant for unknown time
         }
 
         updateDetails(mRecipeStep);
     }
 
-    // Set the appropriate views of a detailed recipe step
+    // Set the description and any media for the details of the recipe step
     public void updateDetails(int step) {
         mRecipeStep = step;
 
@@ -131,8 +137,23 @@ public class StepDetailsFragment extends Fragment {
     }
 
     @Override
+    public void onPause() {
+        // Set current position in ExoPlayyer
+        if (mPlayer != null) mPlayerPosition = mPlayer.getCurrentPosition();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        // Restore previously saved position in ExoPlayer
+        if (mPlayer != null) mPlayer.seekTo(mPlayerPosition);
+        super.onResume();
+    }
+
+    @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
+        outState.putLong(PLAYER_POSITION, mPlayerPosition);
 
         super.onSaveInstanceState(outState);
     }
