@@ -61,7 +61,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 mContext.getString(R.string.preferences_file_key), Context.MODE_PRIVATE);
         String ingredients = sharedPref.getString(
                 mContext.getString(R.string.preferences_ingredients_key),
-                mContext.getString(R.string.error_empty_ingredient_list));
+                mContext.getString(R.string.missing_ingredient_list));
 
         views.setTextViewText(R.id.widget_ingredient_text_view, ingredients);
 

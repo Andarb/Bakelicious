@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
                     List<Recipe> recipes = response.body();
                     if (recipes == null) {
-                        showError(getString(R.string.error_empty_recipe_list));
+                        showError(getString(R.string.missing_recipe_list));
                         return;
                     }
 

@@ -100,8 +100,9 @@ public class StepDetailsFragment extends Fragment {
     // Set the description and any media for the details of the recipe step
     public void updateDetails(int step) {
         mRecipeStep = step;
+        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
+        String description = mRecipe.getSteps().get(mRecipeStep).getDescription().trim();
 
-        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL();
         if (videoUrl.isEmpty()) {
             mPlayerView.setVisibility(View.GONE);
             releasePlayer();
@@ -109,7 +110,9 @@ public class StepDetailsFragment extends Fragment {
             initializePlayer(getActivity(), Uri.parse(videoUrl));
         }
 
-        stepDescriptionTV.setText(mRecipe.getSteps().get(mRecipeStep).getDescription());
+        if (description.isEmpty()) description = getString(R.string.missing_description);
+
+        stepDescriptionTV.setText(description);
     }
 
     // Setup ExoPlayer to play a video
