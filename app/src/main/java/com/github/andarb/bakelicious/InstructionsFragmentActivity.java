@@ -1,7 +1,7 @@
 package com.github.andarb.bakelicious;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.github.andarb.bakelicious.data.Recipe;
 
@@ -12,7 +12,7 @@ import butterknife.ButterKnife;
  * Manages StepDetailsFragment and StepListFragment.
  * Implements Master/Detail flow navigation.
  */
-public class InstructionsFragmentActivity extends FragmentActivity
+public class InstructionsFragmentActivity extends AppCompatActivity
         implements StepListFragment.OnStepSelectedListener {
 
     public final static String RECIPE_EXTRA = "recipe_object";
@@ -32,8 +32,11 @@ public class InstructionsFragmentActivity extends FragmentActivity
 
         if (savedInstanceState != null) {
             // FragmentManager will recreate fragments automatically, so we just need to make sure
-            // we restore Activity members that are needed for fragment operation, and then return;
+            // we restore Activity members that are needed for fragment operation, restore the name
+            // of the action bar, and return.
             mRecipe = savedInstanceState.getParcelable(RECIPE_EXTRA);
+            setTitle(mRecipe.getName());
+
             if (mIsTablet) {
                 mStepDetailsFragment = (StepDetailsFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.details_fragment_container);
@@ -41,12 +44,10 @@ public class InstructionsFragmentActivity extends FragmentActivity
 
             return;
         } else {
-            // Get the clicked recipe (from MainActivity)
+            // Get the clicked recipe (from MainActivity), and set action bar have recipe name
             mRecipe = getIntent().getParcelableExtra(RECIPE_EXTRA);
+            setTitle(mRecipe.getName());
         }
-
-        // Set action bar title to be the name of the recipe
-        setTitle(mRecipe.getName());
 
         // Launch a list of recipe steps on both a phone or a tablet
         StepListFragment stepListFragment = StepListFragment.newInstance(mRecipe);

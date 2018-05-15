@@ -19,6 +19,9 @@ import butterknife.ButterKnife;
  */
 public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder> {
 
+    // Helps separate step numbers from descriptions
+    private final static String DELIMITER = ". ";
+
     private final Context mContext;
     private StepListFragment.OnStepSelectedListener mCallback;
     private Recipe mRecipe;
@@ -61,7 +64,13 @@ public class StepAdapter extends RecyclerView.Adapter<StepAdapter.StepViewHolder
 
     @Override
     public void onBindViewHolder(StepAdapter.StepViewHolder holder, int position) {
-        holder.stepNameTV.setText(position + mRecipe.getSteps().get(position).getShortDescription());
+        String description = mRecipe.getSteps().get(position).getShortDescription().trim();
+
+        // Check if description is available, and skip adding step number if position is zero
+        if (description.isEmpty()) description = mContext.getString(R.string.missing_description);
+        if (position != 0) description = position + DELIMITER + description;
+
+        holder.stepNameTV.setText(description);
     }
 
     @Override
