@@ -2,16 +2,20 @@ package com.github.andarb.bakelicious;
 
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.github.andarb.bakelicious.data.Recipe;
@@ -32,6 +36,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import butterknife.BindBool;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -44,6 +49,8 @@ public class StepDetailsFragment extends Fragment {
 
     private final static String PLAYER_POSITION = "exoplayer_seek";
 
+    @BindBool(R.bool.isTablet)
+    boolean mIsTablet;
     @BindView(R.id.step_description_text_view)
     TextView stepDescriptionTV;
     @BindView(R.id.exoplayer_view)
@@ -166,6 +173,22 @@ public class StepDetailsFragment extends Fragment {
                 .createMediaSource(videoUri);
         mPlayer.prepare(videoSource);
         mPlayer.setPlayWhenReady(true);
+
+        // When using a phone in landscape, make video fullscreen
+        if (context.getResources().getConfiguration().orientation ==
+                Configuration.ORIENTATION_LANDSCAPE && !mIsTablet) {
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)
+                    mPlayerView.getLayoutParams();
+            layoutParams.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
+            mPlayerView.setLayoutParams(layoutParams);
+
+            getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+
+
+        }
     }
 
     /* Release ExoPlayer resources */
