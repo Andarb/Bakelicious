@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".InstructionsFragmentActivity" />
+        <activity
+            android:name=".InstructionsFragmentActivity"
+            android:parentActivityName=".MainActivity" />
 
         <service
             android:name=".widget.ListWidgetService"
