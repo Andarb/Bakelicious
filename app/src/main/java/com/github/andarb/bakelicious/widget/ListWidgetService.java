@@ -45,7 +45,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     public void onDestroy() {
     }
 
-    // As we have the whole list of ingredients in 1 String, count will always be 1
+    /* As we have the whole list of ingredients in 1 String, count will always be 1 */
     @Override
     public int getCount() {
         return 1;

@@ -73,20 +73,20 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         // Retrieve recipe values
-        String imageUrl = mRecipes.get(position).getImage();
-        String recipeName = mRecipes.get(position).getName();
-        String recipeServings = String.valueOf(mRecipes.get(position).getServings());
+        String imageUrl = mRecipes.get(position).getImage().trim();
+        String recipeName = mRecipes.get(position).getName().trim();
+        String recipeServings = String.valueOf(mRecipes.get(position).getServings()).trim();
 
         // Check if they aren't empty, and set
-        if (!imageUrl.trim().isEmpty()) Picasso.get().load(imageUrl).into(holder.recipePhotoIV);
+        if (!imageUrl.isEmpty()) Picasso.get().load(imageUrl).into(holder.recipePhotoIV);
 
-        if (!recipeName.trim().isEmpty()) {
+        if (!recipeName.isEmpty()) {
             holder.recipeNameTV.setText(recipeName);
         } else {
             holder.recipeNameTV.setText(R.string.missing_recipe_name);
         }
 
-        if (!recipeServings.trim().isEmpty()) {
+        if (!recipeServings.isEmpty()) {
             holder.recipeServingsTV.setText(recipeServings);
         } else {
             holder.recipeServingsTV.setText(R.string.missing_servings);

@@ -57,11 +57,11 @@ public class StepListFragment extends Fragment {
     private Unbinder mButterknifeUnbinder;
 
 
-    // Required empty public constructor
+    /* Required empty public constructor */
     public StepListFragment() {
     }
 
-    // Create a new instance of the fragment, and pass it a recipe
+    /* Create a new instance of the fragment, and pass it a recipe */
     public static StepListFragment newInstance(Recipe recipe) {
         StepListFragment f = new StepListFragment();
 
@@ -98,7 +98,7 @@ public class StepListFragment extends Fragment {
         return view;
     }
 
-    // Create a list of ingredients out of individual values
+    /* Create a list of ingredients out of individual values */
     private String parseIngredients(List<Ingredient> ingredients) {
         StringBuilder sB = new StringBuilder();
         DecimalFormat dF = new DecimalFormat("#.#"); // remove trailing zeros
@@ -136,7 +136,7 @@ public class StepListFragment extends Fragment {
         return sB.toString().toLowerCase().trim();
     }
 
-    // Save recipe name and its ingredients, and try to update the widget
+    /* Save recipe name and its ingredients, and try to update the widget */
     private void saveIngredients(String recipe, String ingredients) {
         Activity activity = getActivity();
         SharedPreferences sharedPref = activity.getSharedPreferences(
@@ -154,7 +154,7 @@ public class StepListFragment extends Fragment {
         activity.sendBroadcast(intent);
     }
 
-    // This ensures InstructionsFragmentActivity has implemented OnStepSelectedListener interface
+    /* This ensures InstructionsFragmentActivity has implemented OnStepSelectedListener interface */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -167,11 +167,10 @@ public class StepListFragment extends Fragment {
         }
     }
 
-    // Required unbind when using Butterknife with Fragments
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        mButterknifeUnbinder.unbind();
+        mButterknifeUnbinder.unbind(); // Required unbind when using Butterknife with Fragments
     }
 }

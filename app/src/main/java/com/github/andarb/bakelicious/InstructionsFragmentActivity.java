@@ -63,7 +63,7 @@ public class InstructionsFragmentActivity extends AppCompatActivity
         }
     }
 
-    // When a recipe step in StepListFragment is clicked, update or replace StepDetailsFragment
+    /* When a recipe step in StepListFragment is clicked, update or replace StepDetailsFragment */
     @Override
     public void onStepSelected(int position) {
         if (mIsTablet) {
@@ -77,7 +77,7 @@ public class InstructionsFragmentActivity extends AppCompatActivity
         }
     }
 
-    // Save recipe details, so we don't need to do another network request for them
+    /* Save recipe details, so we don't need to do another network request for them */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(RECIPE_EXTRA, mRecipe);
