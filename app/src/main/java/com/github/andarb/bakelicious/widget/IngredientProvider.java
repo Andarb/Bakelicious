@@ -1,5 +1,6 @@
 package com.github.andarb.bakelicious.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -8,9 +9,13 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
+import com.github.andarb.bakelicious.MainActivity;
 import com.github.andarb.bakelicious.R;
 
 public class IngredientProvider extends AppWidgetProvider {
+
+    public static final String WIDGET_EXTRA = "widget_launch";
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
@@ -29,13 +34,20 @@ public class IngredientProvider extends AppWidgetProvider {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredient_widget);
             if (!recipe.equals(defaultValue)) {
                 // Intent for ListWidgetService that provides the ingredients view
-                Intent intent = new Intent(context, ListWidgetService.class);
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-                intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+                Intent serviceIntent = new Intent(context, ListWidgetService.class);
+                serviceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+                serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
-                views.setRemoteAdapter(R.id.widget_ingredient_list_view, intent);
+                views.setRemoteAdapter(R.id.widget_ingredient_list_view, serviceIntent);
             }
             views.setTextViewText(R.id.widget_recipe_text_view, recipe);
+
+            // When recipe name is clicked, MainActivity is launched. Extra is passed to let the
+            // activity know it was launched by the widget.
+            Intent widgetIntent = new Intent(context, MainActivity.class);
+            widgetIntent.putExtra(WIDGET_EXTRA, true);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, widgetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            views.setOnClickPendingIntent(R.id.widget_recipe_text_view, pendingIntent);
 
             // Update the widget
             appWidgetManager.updateAppWidget(appWidgetId, views);

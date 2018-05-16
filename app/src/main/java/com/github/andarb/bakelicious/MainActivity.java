@@ -1,5 +1,8 @@
 package com.github.andarb.bakelicious;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import com.github.andarb.bakelicious.adapters.RecipeAdapter;
 import com.github.andarb.bakelicious.data.Recipe;
 import com.github.andarb.bakelicious.utils.RetrofitClient;
+import com.github.andarb.bakelicious.widget.IngredientProvider;
 
 import java.util.List;
 
@@ -39,11 +43,16 @@ public class MainActivity extends AppCompatActivity {
     @BindBool(R.bool.isTablet)
     boolean mIsTablet;
 
+    private boolean mLaunchedByWidget;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        // Check if this activity was launched from our widget
+        mLaunchedByWidget = getIntent().getBooleanExtra(IngredientProvider.WIDGET_EXTRA, false);
 
         // Start the download of recipes
         downloadRecipes();
@@ -51,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         // Check if the app is running on a tablet or a phone.
         // And, set the appropriate number of columns in GridView.
         int nrOfGridColumns;
-        if(mIsTablet) {
+        if (mIsTablet) {
             nrOfGridColumns = 3;
         } else {
             nrOfGridColumns = 1;
@@ -79,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
+                    // Try to open the recipe clicked in the widget
+                    if (mLaunchedByWidget) openWidgetRecipe(recipes);
+
                     RecipeAdapter recipeAdapter = new RecipeAdapter(MainActivity.this, recipes);
                     mRecyclerView.setAdapter(recipeAdapter);
                 } else {
@@ -93,6 +105,30 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /* Retrieve the last saved recipe name (if any), and open the appropriate recipe */
+    private void openWidgetRecipe(List<Recipe> recipes) {
+        SharedPreferences sharedPref =
+                getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE);
+
+        String defaultValue = getString(R.string.preferences_recipe_default_value);
+        String recipeKey = getString(R.string.preferences_recipe_key);
+        String recipeName = sharedPref.getString(recipeKey, defaultValue);
+
+        // If widget/SharedPrefs are empty, remain in MainActivity so a recipe can be chosen
+        if (!recipeKey.equals(defaultValue)) {
+            for (int i = 0; i < recipes.size(); i++) {
+                if (recipes.get(i).getName().equals(recipeName)) {
+                    Intent intent = new Intent(this, InstructionsFragmentActivity.class);
+                    intent.putExtra(InstructionsFragmentActivity.RECIPE_EXTRA,
+                            recipes.get(i));
+
+                    startActivity(intent);
+                }
+            }
+        }
+    }
+
+    /* Hides loading bar and displays an error message */
     private void showError(String error) {
         mProgressBar.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
@@ -100,12 +136,14 @@ public class MainActivity extends AppCompatActivity {
         mErrorLayout.setVisibility(View.VISIBLE);
     }
 
+    /* Hides the error layout and the loading animation, and displays the downloaded results */
     private void hideError() {
         mProgressBar.setVisibility(View.GONE);
         mErrorLayout.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
     }
 
+    /* Used to retry downloading recipes when network issues occur */
     @OnClick(R.id.error_retry_button)
     public void onRetryClicked() {
         downloadRecipes();
