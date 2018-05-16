@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.andarb.bakelicious.data.Recipe;
@@ -39,6 +40,7 @@ import com.squareup.picasso.Target;
 import butterknife.BindBool;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -55,6 +57,10 @@ public class StepDetailsFragment extends Fragment {
     TextView stepDescriptionTV;
     @BindView(R.id.exoplayer_view)
     PlayerView mPlayerView;
+    @BindView(R.id.previous_step_button)
+    ImageView mPreviousButton;
+    @BindView(R.id.next_step_button)
+    ImageView mNextButton;
 
     private Recipe mRecipe;
     private int mRecipeStep;
@@ -114,6 +120,18 @@ public class StepDetailsFragment extends Fragment {
         if (mPlayer != null) releasePlayer();
         mRecipeStep = step;
         mHidePlayer = true; // Will remain true unless we successfully load a thumbnail or a video
+
+        // Hide step navigation buttons if they will go out of bounds
+        if (mRecipeStep - 1 < 0) {
+            mPreviousButton.setVisibility(View.GONE);
+        } else {
+            mPreviousButton.setVisibility(View.VISIBLE);
+        }
+        if (mRecipeStep + 1 >= mRecipe.getSteps().size()) {
+            mNextButton.setVisibility(View.GONE);
+        } else {
+            mNextButton.setVisibility(View.VISIBLE);
+        }
 
         String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL().trim();
         String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
@@ -177,17 +195,21 @@ public class StepDetailsFragment extends Fragment {
         // When using a phone in landscape, make video fullscreen
         if (context.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE && !mIsTablet) {
+            // Resize ExoPlayer view
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)
                     mPlayerView.getLayoutParams();
             layoutParams.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
             layoutParams.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
             mPlayerView.setLayoutParams(layoutParams);
 
+            // Hide notification and action bars
             getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
             ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
 
-
+            // Hide navigation buttons
+            mPreviousButton.setVisibility(View.GONE);
+            mNextButton.setVisibility(View.GONE);
         }
     }
 
@@ -198,6 +220,18 @@ public class StepDetailsFragment extends Fragment {
             mPlayer.release();
             mPlayer = null;
         }
+    }
+
+    /* Opens next recipe step */
+    @OnClick(R.id.next_step_button)
+    public void onNextStepClicked() {
+        updateDetails(++mRecipeStep);
+    }
+
+    /* Opens previous recipe step */
+    @OnClick(R.id.previous_step_button)
+    public void onPreviousStepClicked() {
+        updateDetails(--mRecipeStep);
     }
 
     @Override
@@ -228,7 +262,6 @@ public class StepDetailsFragment extends Fragment {
 
         super.onSaveInstanceState(outState);
     }
-
 
     @Override
     public void onDestroyView() {
