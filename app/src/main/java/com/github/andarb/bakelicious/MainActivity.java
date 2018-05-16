@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.github.andarb.bakelicious.adapters.RecipeAdapter;
 import com.github.andarb.bakelicious.data.Recipe;
+import com.github.andarb.bakelicious.utils.EspressoIdlingResource;
 import com.github.andarb.bakelicious.utils.RetrofitClient;
 import com.github.andarb.bakelicious.widget.IngredientProvider;
 
@@ -75,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.VISIBLE);
         Call<List<Recipe>> getCall = RetrofitClient.getRecipes();
 
+        EspressoIdlingResource.increment(); // Prevents Espresso from testing
+
         getCall.enqueue(new Callback<List<Recipe>>() {
             @Override
             public void onResponse(Call<List<Recipe>> call,
@@ -103,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
                 showError(getString(R.string.error_internet));
             }
         });
+
+        EspressoIdlingResource.decrement(); // Tell Espresso to resume testing
     }
 
     /* Retrieve the last saved recipe name (if any), and open the appropriate recipe */
