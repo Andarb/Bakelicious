@@ -12,13 +12,18 @@ import android.widget.RemoteViews;
 import com.github.andarb.bakelicious.MainActivity;
 import com.github.andarb.bakelicious.R;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+
+/**
+ * Setup a widget to display a list of a recipe name and a list of ingredients.
+ * A recipe name can be clicked, which opens that recipe in our app.
+ */
 public class IngredientProvider extends AppWidgetProvider {
 
     public static final String WIDGET_EXTRA = "widget_launch";
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
         // Iterate over all widgets
         for (int i = 0; i < appWidgetIds.length; i++) {
             int appWidgetId = appWidgetIds[i];
@@ -45,8 +50,12 @@ public class IngredientProvider extends AppWidgetProvider {
             // When recipe name is clicked, MainActivity is launched. Extra is passed to let the
             // activity know it was launched by the widget.
             Intent widgetIntent = new Intent(context, MainActivity.class);
+            // We don't need a stack history, as the recipe clicked in the widget will always be
+            // the last one opened in the app
+            widgetIntent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+            widgetIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             widgetIntent.putExtra(WIDGET_EXTRA, true);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, widgetIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, widgetIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             views.setOnClickPendingIntent(R.id.widget_recipe_text_view, pendingIntent);
 
             // Update the widget

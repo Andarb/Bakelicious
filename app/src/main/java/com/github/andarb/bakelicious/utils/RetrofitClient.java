@@ -20,7 +20,7 @@ public final class RetrofitClient {
             "https://d17h27t6h515a5.cloudfront.net/topher/";
     private static final String FILE_URL = "2017/May/59121517_baking/baking.json";
 
-    /* Retrofit recipe interface */
+    // Retrofit recipe interface
     private interface RecipeApi {
         @GET(FILE_URL)
         Call<List<Recipe>> getRecipeList();
