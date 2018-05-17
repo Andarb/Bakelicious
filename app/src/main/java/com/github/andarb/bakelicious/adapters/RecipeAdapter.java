@@ -75,7 +75,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         // Retrieve recipe values
         String imageUrl = mRecipes.get(position).getImage().trim();
         String recipeName = mRecipes.get(position).getName().trim();
-        String recipeServings = String.valueOf(mRecipes.get(position).getServings()).trim();
+        String servings = String.valueOf(mRecipes.get(position).getServings()).trim();
 
         // Check if they aren't empty, and set
         if (!imageUrl.isEmpty()) Picasso.get().load(imageUrl).into(holder.recipePhotoIV);
@@ -86,8 +86,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             holder.recipeNameTV.setText(R.string.missing_recipe_name);
         }
 
-        if (!recipeServings.isEmpty()) {
-            holder.recipeServingsTV.setText(recipeServings);
+        if (!servings.isEmpty()) {
+            holder.recipeServingsTV.setText(mContext.getString(R.string.recipe_serves, servings));
         } else {
             holder.recipeServingsTV.setText(R.string.missing_servings);
         }

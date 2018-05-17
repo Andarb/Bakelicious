@@ -3,9 +3,11 @@ package com.github.andarb.bakelicious;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,6 +27,7 @@ import com.github.andarb.bakelicious.widget.IngredientProvider;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import butterknife.BindBool;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -39,22 +42,30 @@ public class StepListFragment extends Fragment {
     // Used to parse a list of ingredients
     private final static String NEW_LINE = "\n";
     private final static String SPACE = " ";
-    private final static String HYPHEN = "- ";
+    private final static String HYPHEN = "-" + SPACE;
+
+    // Action for the broadcast receiver
+    public static final String STEP_SELECTED_ACTION =
+            "com.github.andarb.bakelicious.RECIPE_STEP_SELECTED";
 
     // InstructionsFragmentActivity must implement this interface in order for
     // StepListFragment and StepDetailsFragment to communicate when a recipe step is clicked.
     public interface OnStepSelectedListener {
-        public void onStepSelected(int position);
+        void onStepSelected(int position);
     }
-
     OnStepSelectedListener mCallback;
 
+
+    @BindBool(R.bool.isTablet)
+    boolean mIsTablet;
     @BindView(R.id.steps_recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.ingredients_text_view)
     TextView mIngredientsTV;
 
     private Unbinder mButterknifeUnbinder;
+    private StepReceiver mStepReceiver;
+    private StepAdapter mStepAdapter;
 
 
     /* Required empty public constructor */
@@ -79,6 +90,13 @@ public class StepListFragment extends Fragment {
         View view = inflater.inflate(R.layout.step_list, container, false);
         mButterknifeUnbinder = ButterKnife.bind(this, view);
 
+        // Register a broadcast receiver
+        if (mIsTablet) {
+            mStepReceiver = new StepReceiver();
+            IntentFilter filter = new IntentFilter(STEP_SELECTED_ACTION);
+            getActivity().registerReceiver(mStepReceiver, filter);
+        }
+
         // Retrieve recipe from our activity
         Recipe recipe = getArguments().getParcelable(InstructionsFragmentActivity.RECIPE_EXTRA);
 
@@ -88,12 +106,12 @@ public class StepListFragment extends Fragment {
         saveIngredients(recipe.getName(), ingredients);
 
         // Set up the adapter and recyclerview to display recipe steps
-        StepAdapter stepAdapter = new StepAdapter(context, mCallback, recipe);
+        mStepAdapter = new StepAdapter(context, mCallback, recipe, mIsTablet);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager
                 (context, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setAdapter(stepAdapter);
+        mRecyclerView.setAdapter(mStepAdapter);
 
         return view;
     }
@@ -171,6 +189,30 @@ public class StepListFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
 
+        // Broadcast receiver no longer needed
+        if (mIsTablet) getActivity().unregisterReceiver(mStepReceiver);
+
         mButterknifeUnbinder.unbind(); // Required unbind when using Butterknife with Fragments
+    }
+
+
+    /**
+     * Listens for Previous/Next step button clicks in StepDetailsFragment.
+     * When received, scroll to the new step in the list.
+     * And update the adapter to highlight the new selected step.
+     */
+    private class StepReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(STEP_SELECTED_ACTION)) {
+                int position = intent.getIntExtra(InstructionsFragmentActivity.STEP_EXTRA,
+                        RecyclerView.NO_POSITION);
+
+                mRecyclerView.scrollToPosition(position);
+                mStepAdapter.setClickedStep(position);
+                mStepAdapter.notifyDataSetChanged();
+            }
+        }
     }
 }
