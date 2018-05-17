@@ -2,6 +2,7 @@ package com.github.andarb.bakelicious;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -195,6 +196,7 @@ public class StepDetailsFragment extends Fragment {
         // When using a phone in landscape, make video fullscreen
         if (context.getResources().getConfiguration().orientation ==
                 Configuration.ORIENTATION_LANDSCAPE && !mIsTablet) {
+
             // Resize ExoPlayer view
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)
                     mPlayerView.getLayoutParams();
@@ -225,13 +227,33 @@ public class StepDetailsFragment extends Fragment {
     /* Opens next recipe step */
     @OnClick(R.id.next_step_button)
     public void onNextStepClicked() {
-        updateDetails(++mRecipeStep);
+        mRecipeStep++;
+
+        // Send a broadcast to update the highlighting of list items in StepAdapter
+        if (mIsTablet) {
+            Intent intent = new Intent();
+            intent.setAction(StepListFragment.STEP_SELECTED_ACTION);
+            intent.putExtra(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
+            getActivity().sendBroadcast(intent);
+        }
+
+        updateDetails(mRecipeStep);
     }
 
     /* Opens previous recipe step */
     @OnClick(R.id.previous_step_button)
     public void onPreviousStepClicked() {
-        updateDetails(--mRecipeStep);
+        mRecipeStep--;
+
+        // Send a broadcast to update the highlighting of list items in StepAdapter
+        if (mIsTablet) {
+            Intent intent = new Intent();
+            intent.setAction(StepListFragment.STEP_SELECTED_ACTION);
+            intent.putExtra(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
+            getActivity().sendBroadcast(intent);
+        }
+
+        updateDetails(mRecipeStep);
     }
 
     @Override

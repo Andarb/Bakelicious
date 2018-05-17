@@ -7,6 +7,9 @@
     <string name="error_internet">Unable to establish connection.\n\n Please check your
         Cell/Wi-Fi signal, and try again.</string>
 
+    <!--Error message button-->
+    <string name="error_retry_button">Retry</string>
+
     <!--Missing recipe values-->
     <string name="missing_recipe_name">Unknown name</string>
     <string name="missing_servings">Amount of servings unknown</string>
@@ -17,11 +20,20 @@
     <string name="missing_measure">[measure unknown]</string>
     <string name="missing_ingredient">[ingredient unknown]</string>
 
-    <!--Error message button-->
-    <string name="error_retry_button">Retry</string>
+    <!--Amount of people the recipe serves-->
+    <string name="recipe_serves">SERVES %1$s</string>
+
+    <!--Labels for recipe instructions-->
+    <string name="label_ingredients">INGREDIENTS</string>
+    <string name="label_steps">STEPS</string>
+    <string name="label_details">DETAILS</string>
 
     <!--a11y text-->
     <string name="a11y_recipe_photo">Photo of the dish.</string>
+
+    <!--Tools text used for app development only-->
+    <string name="tools_recipe_text" translatable="false">Nutella Pie</string>
+    <string name="tools_recipe_servings" translatable="false">SERVES 8</string>
 
     <!--Preferences keys and default values-->
     <string name="preferences_file_key">file</string>
