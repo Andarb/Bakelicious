@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -66,7 +67,6 @@ public class StepDetailsFragment extends Fragment {
     private Recipe mRecipe;
     private int mRecipeStep;
     private SimpleExoPlayer mPlayer;
-    private boolean mHidePlayer;
     private long mPlayerPosition;
     private Unbinder mButterknifeUnbinder;
 
@@ -120,7 +120,6 @@ public class StepDetailsFragment extends Fragment {
     public void updateDetails(int step) {
         if (mPlayer != null) releasePlayer();
         mRecipeStep = step;
-        mHidePlayer = true; // Will remain true unless we successfully load a thumbnail or a video
 
         // Hide step navigation buttons if they will go out of bounds
         if (mRecipeStep - 1 < 0) {
@@ -134,45 +133,20 @@ public class StepDetailsFragment extends Fragment {
             mNextButton.setVisibility(View.VISIBLE);
         }
 
+        // Retrieve step details
         String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL().trim();
         String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
         String description = mRecipe.getSteps().get(mRecipeStep).getDescription().trim();
 
-        // Hide the player if there is no video or thumbnail to show
-        if (!thumbnailUrl.isEmpty()) setThumbnail(thumbnailUrl);
-        if (!videoUrl.isEmpty()) initializePlayer(getActivity(), Uri.parse(videoUrl));
-        if (mHidePlayer) mPlayerView.setVisibility(View.GONE);
-
+        // Initialize the video player and set step description
+        initializePlayer(getActivity(), thumbnailUrl, videoUrl);
         if (description.isEmpty()) description = getString(R.string.missing_description);
         stepDescriptionTV.setText(description);
     }
 
-    /* Try to download the thumbnail, decode it to bitmap and display it on the ExoPlayer view */
-    private void setThumbnail(String url) {
-        // Create strong reference to prevent garbage collection
-        Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                mPlayerView.setDefaultArtwork(bitmap);
-                mHidePlayer = false;
-            }
 
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-            }
-        };
-
-        Picasso.get().load(url).into(target);
-    }
-
-    /* Setup ExoPlayer to play a video */
-    private void initializePlayer(Context context, Uri videoUri) {
-        mPlayerView.setVisibility(View.VISIBLE);
-        mHidePlayer = false;
+    /* Setup ExoPlayer to play a video or show a thumbnail/placeholder */
+    private void initializePlayer(Context context, String thumbnailUrl, String videoUrl) {
 
         // Create a default TrackSelector
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -181,17 +155,36 @@ public class StepDetailsFragment extends Fragment {
         TrackSelector trackSelector =
                 new DefaultTrackSelector(videoTrackSelectionFactory);
 
-        // Create the player and set its view
+        // Create a player instance, and associate it with its view
         mPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
         mPlayerView.setPlayer(mPlayer);
 
-        // Prepare media player source, and start playing the video
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, getString(R.string.app_name)), bandwidthMeter);
-        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(videoUri);
-        mPlayer.prepare(videoSource);
-        mPlayer.setPlayWhenReady(true);
+        if (!videoUrl.isEmpty()) {
+            mPlayerView.setUseController(true);
+
+            // Set a thumbnail or a loading placeholder image, before downloading the video
+            if (!thumbnailUrl.isEmpty()) {
+                setThumbnail(thumbnailUrl);
+            } else {
+                mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getActivity().getResources(),
+                        R.drawable.player_loading));
+            }
+
+            // Prepare media player source, and start playing the video, and hide controls
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                    Util.getUserAgent(context, getString(R.string.app_name)), bandwidthMeter);
+            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(videoUrl));
+            mPlayer.prepare(videoSource);
+            mPlayer.setPlayWhenReady(true);
+            mPlayerView.hideController();
+
+        } else {
+            // If no video exists, disable controls, and show a default placeholder
+            mPlayerView.setUseController(false);
+            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getActivity().getResources(),
+                    R.drawable.player_no_video));
+        }
 
         // When using a phone in landscape, make video fullscreen
         if (context.getResources().getConfiguration().orientation ==
@@ -213,6 +206,27 @@ public class StepDetailsFragment extends Fragment {
             mPreviousButton.setVisibility(View.GONE);
             mNextButton.setVisibility(View.GONE);
         }
+    }
+
+    /* Try to download the thumbnail, decode it to bitmap and display it on the ExoPlayer view */
+    private void setThumbnail(String url) {
+        // Create strong reference to prevent garbage collection
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                mPlayerView.setDefaultArtwork(bitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+            }
+        };
+
+        Picasso.get().load(url).into(target);
     }
 
     /* Release ExoPlayer resources */
