@@ -41,6 +41,6 @@
     <!--Preferences keys and default values-->
     <string name="preferences_file_key" translatable="false">file</string>
     <string name="preferences_recipe_key" translatable="false">recipe</string>
-    <string name="preferences_ingredients_key" translatable="false">ingredients</string>
     <string name="preferences_recipe_default_value" translatable="false">Please select a recipe first.</string>
+    <string name="preferences_ingredients_key" translatable="false">ingredients</string>
 </resources>
