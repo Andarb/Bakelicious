@@ -30,14 +30,17 @@
 
     <!--a11y text-->
     <string name="a11y_recipe_photo">Photo of the dish.</string>
+    <string name="a11y_previous_step">Arrow image to go back one step.</string>
+    <string name="a11y_next_step">Arrow image to go forward one step.</string>
+    <string name="a11y_cake_icon">Generic cake icon.</string>
 
     <!--Tools text used for app development only-->
     <string name="tools_recipe_text" translatable="false">Nutella Pie</string>
     <string name="tools_recipe_servings" translatable="false">SERVES 8</string>
 
     <!--Preferences keys and default values-->
-    <string name="preferences_file_key">file</string>
-    <string name="preferences_recipe_key">recipe</string>
-    <string name="preferences_ingredients_key">ingredients</string>
-    <string name="preferences_recipe_default_value">Please select a recipe first.</string>
+    <string name="preferences_file_key" translatable="false">file</string>
+    <string name="preferences_recipe_key" translatable="false">recipe</string>
+    <string name="preferences_ingredients_key" translatable="false">ingredients</string>
+    <string name="preferences_recipe_default_value" translatable="false">Please select a recipe first.</string>
 </resources>

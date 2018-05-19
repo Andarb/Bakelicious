@@ -3,18 +3,20 @@
     android:id="@+id/step_list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="12dp"
+    android:background="@drawable/step_background"
+    android:foreground="?android:attr/selectableItemBackground"
     android:paddingBottom="12dp"
-    android:paddingStart="20dp"
     android:paddingEnd="20dp"
-    android:background="@drawable/step_background">
+    android:paddingStart="20dp"
+    android:paddingTop="12dp">
 
     <ImageView
         android:id="@+id/step_introduction_image_view"
-        android:src="@drawable/baseline_cake_grey_18"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
+        android:contentDescription="@string/a11y_cake_icon"
+        android:src="@drawable/baseline_cake_grey_18"
         android:visibility="gone" />
 
     <TextView
