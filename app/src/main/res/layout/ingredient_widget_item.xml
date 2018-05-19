@@ -6,6 +6,7 @@
     <TextView
         android:id="@+id/widget_ingredient_text_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextSecondary" />
 
 </FrameLayout>

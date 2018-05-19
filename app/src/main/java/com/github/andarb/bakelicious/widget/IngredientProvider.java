@@ -37,6 +37,7 @@ public class IngredientProvider extends AppWidgetProvider {
 
             // Set ListView adapter for ingredients if they're available, and set the recipe name
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredient_widget);
+
             if (!recipe.equals(defaultValue)) {
                 // Intent for ListWidgetService that provides the ingredients view
                 Intent serviceIntent = new Intent(context, ListWidgetService.class);
@@ -44,6 +45,8 @@ public class IngredientProvider extends AppWidgetProvider {
                 serviceIntent.setData(Uri.parse(serviceIntent.toUri(Intent.URI_INTENT_SCHEME)));
 
                 views.setRemoteAdapter(R.id.widget_ingredient_list_view, serviceIntent);
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId,
+                        R.id.widget_ingredient_list_view);
             }
             views.setTextViewText(R.id.widget_recipe_text_view, recipe);
 
