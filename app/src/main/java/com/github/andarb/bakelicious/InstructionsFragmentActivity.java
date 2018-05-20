@@ -30,6 +30,9 @@ public class InstructionsFragmentActivity extends AppCompatActivity
         setContentView(R.layout.instructions);
         ButterKnife.bind(this);
 
+        // Add UP navigation
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         if (savedInstanceState != null) {
             // FragmentManager will recreate fragments automatically, so we just need to make sure
             // we restore Activity members that are needed for fragment operation, restore the name
