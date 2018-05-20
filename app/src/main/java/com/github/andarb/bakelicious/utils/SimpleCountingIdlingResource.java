@@ -12,6 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * This class can then be used to wrap up operations that while in progress should block tests from
  * accessing the UI.
+ *
+ * Author: GoogleCodeLabs
+ * Link: https://github.com/googlecodelabs/android-testing/blob/master/app/src/main/java/com/
+ * example/android/testing/notes/util/SimpleCountingIdlingResource.java
  */
 public final class SimpleCountingIdlingResource implements IdlingResource {
 

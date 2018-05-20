@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -32,6 +34,12 @@ import retrofit2.Response;
  * Recipes can be clicked on to get further details and instructions.
  */
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    // Number of columns in RecyclerView's GridLayout
+    private static final int GRID_COLUMNS_PHONE = 1;
+    private static final int GRID_COLUMNS_TABLET = 3;
 
     @BindView(R.id.recipes_recycler_view)
     RecyclerView mRecyclerView;
@@ -62,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         // And, set the appropriate number of columns in GridView.
         int nrOfGridColumns;
         if (mIsTablet) {
-            nrOfGridColumns = 3;
+            nrOfGridColumns = GRID_COLUMNS_TABLET;
         } else {
-            nrOfGridColumns = 1;
+            nrOfGridColumns = GRID_COLUMNS_PHONE;
         }
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, nrOfGridColumns));
@@ -72,16 +80,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* Download and parse a list of recipes using Retrofit */
-    public void downloadRecipes() {
+    private void downloadRecipes() {
         mProgressBar.setVisibility(View.VISIBLE);
         Call<List<Recipe>> getCall = RetrofitClient.getRecipes();
 
-        EspressoIdlingResource.increment(); // Prevents Espresso from testing
+        EspressoIdlingResource.increment(); // Prevents Espresso from testing for now
 
         getCall.enqueue(new Callback<List<Recipe>>() {
             @Override
-            public void onResponse(Call<List<Recipe>> call,
-                                   Response<List<Recipe>> response) {
+            public void onResponse(@NonNull Call<List<Recipe>> call,
+                                   @NonNull Response<List<Recipe>> response) {
                 if (response.isSuccessful()) {
                     hideError();
 
@@ -97,12 +105,13 @@ public class MainActivity extends AppCompatActivity {
                     RecipeAdapter recipeAdapter = new RecipeAdapter(MainActivity.this, recipes);
                     mRecyclerView.setAdapter(recipeAdapter);
                 } else {
-                    showError(getString(R.string.error_server_status) + response.code());
+                    showError(getString(R.string.error_server));
+                    Log.w(TAG, getString(R.string.error_server_status) + response.code());
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Recipe>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Recipe>> call, @NonNull Throwable t) {
                 showError(getString(R.string.error_internet));
             }
         });

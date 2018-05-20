@@ -106,8 +106,9 @@ public class StepDetailsFragment extends Fragment {
         if (savedInstanceState != null) {
             // Since both fragments are visible on a tablet, the recipe step must be intialized to 0
             // on fragment creation. When fragment is recreated we need to restore the correct step.
-            mRecipeStep = savedInstanceState.getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
             mPlayerPosition = savedInstanceState.getLong(PLAYER_POSITION, C.TIME_UNSET);
+            mRecipeStep = savedInstanceState.getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+            if (mIsTablet) highlightRecipeStep();
         } else {
             mRecipeStep = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
             mPlayerPosition = C.TIME_UNSET; // ExoPlayer constant for unknown time
@@ -238,18 +239,20 @@ public class StepDetailsFragment extends Fragment {
         }
     }
 
+    /* Send a broadcast to update the highlighting of list items in StepAdapter */
+    private void highlightRecipeStep() {
+        Intent intent = new Intent();
+        intent.setAction(StepListFragment.STEP_SELECTED_ACTION);
+        intent.putExtra(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
+        getActivity().sendBroadcast(intent);
+    }
+
     /* Opens next recipe step */
     @OnClick(R.id.next_step_button)
     public void onNextStepClicked() {
         mRecipeStep++;
 
-        // Send a broadcast to update the highlighting of list items in StepAdapter
-        if (mIsTablet) {
-            Intent intent = new Intent();
-            intent.setAction(StepListFragment.STEP_SELECTED_ACTION);
-            intent.putExtra(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
-            getActivity().sendBroadcast(intent);
-        }
+        if (mIsTablet) highlightRecipeStep();
 
         updateDetails(mRecipeStep);
     }
@@ -259,13 +262,7 @@ public class StepDetailsFragment extends Fragment {
     public void onPreviousStepClicked() {
         mRecipeStep--;
 
-        // Send a broadcast to update the highlighting of list items in StepAdapter
-        if (mIsTablet) {
-            Intent intent = new Intent();
-            intent.setAction(StepListFragment.STEP_SELECTED_ACTION);
-            intent.putExtra(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
-            getActivity().sendBroadcast(intent);
-        }
+        if (mIsTablet) highlightRecipeStep();
 
         updateDetails(mRecipeStep);
     }

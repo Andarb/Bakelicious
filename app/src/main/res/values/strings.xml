@@ -33,6 +33,10 @@
     <string name="a11y_previous_step">Arrow image to go back one step.</string>
     <string name="a11y_next_step">Arrow image to go forward one step.</string>
     <string name="a11y_cake_icon">Generic cake icon.</string>
+    <string name="a11y_exoplayer_play">Play video button.</string>
+    <string name="a11y_exoplayer_pause">Pause video button.</string>
+    <string name="a11y_exoplayer_previous">Rewind video to the beginning button.</string>
+    <string name="a11y_connection_warning">Warning icon.</string>
 
     <!--Tools text used for app development only-->
     <string name="tools_recipe_text" translatable="false">Nutella Pie</string>
