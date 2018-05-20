@@ -53,7 +53,8 @@ public class StepListFragment extends Fragment {
     public interface OnStepSelectedListener {
         void onStepSelected(int position);
     }
-    OnStepSelectedListener mCallback;
+
+    private OnStepSelectedListener mCallback;
 
 
     @BindBool(R.bool.isTablet)
