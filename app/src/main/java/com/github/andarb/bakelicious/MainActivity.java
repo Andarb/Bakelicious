@@ -104,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
                     RecipeAdapter recipeAdapter = new RecipeAdapter(MainActivity.this, recipes);
                     mRecyclerView.setAdapter(recipeAdapter);
+
+                    EspressoIdlingResource.decrement(); // Tell Espresso to resume testing
                 } else {
                     showError(getString(R.string.error_server));
                     Log.w(TAG, getString(R.string.error_server_status) + response.code());
@@ -115,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 showError(getString(R.string.error_internet));
             }
         });
-
-        EspressoIdlingResource.decrement(); // Tell Espresso to resume testing
     }
 
     /* Retrieve the last saved recipe name (if any), and open the appropriate recipe */
