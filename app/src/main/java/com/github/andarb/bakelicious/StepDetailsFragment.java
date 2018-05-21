@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,8 +141,8 @@ public class StepDetailsFragment extends Fragment {
         initializePlayer();
 
         // Set a detailed description for the step
-        String description = mRecipe.getSteps().get(mRecipeStep).getDescription().trim();
-        if (description.isEmpty()) description = getString(R.string.missing_description);
+        String description = mRecipe.getSteps().get(mRecipeStep).getDescription();
+        if (TextUtils.isEmpty(description)) description = getString(R.string.missing_description);
         stepDescriptionTV.setText(description);
     }
 
@@ -151,8 +152,8 @@ public class StepDetailsFragment extends Fragment {
         Context context = getActivity();
 
         // Retrieve video and thumbnail URLs
-        String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL().trim();
-        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
+        String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL();
+        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL();
 
         // Create a default TrackSelector
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -165,11 +166,11 @@ public class StepDetailsFragment extends Fragment {
         mPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
         mPlayerView.setPlayer(mPlayer);
 
-        if (!videoUrl.isEmpty()) {
+        if (!TextUtils.isEmpty(videoUrl)) {
             mPlayerView.setUseController(true);
 
             // Set a thumbnail or a loading placeholder image, before downloading the video
-            if (!thumbnailUrl.isEmpty()) {
+            if (!TextUtils.isEmpty(thumbnailUrl)) {
                 setThumbnail(thumbnailUrl);
             } else {
                 mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource(getActivity().getResources(),

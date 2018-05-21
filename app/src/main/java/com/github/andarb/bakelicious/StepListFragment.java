@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -124,19 +125,19 @@ public class StepListFragment extends Fragment {
 
         for (int i = 0; i < ingredients.size(); i++) {
             String quantity = String.valueOf(dF.format(ingredients.get(i).getQuantity()));
-            String measure = ingredients.get(i).getMeasure().trim();
-            String ingredient = ingredients.get(i).getIngredient().trim();
+            String measure = ingredients.get(i).getMeasure();
+            String ingredient = ingredients.get(i).getIngredient();
 
             sB.append(HYPHEN);
 
             // Check if any values are empty
-            if (quantity.isEmpty()) {
+            if (TextUtils.isEmpty(quantity)) {
                 quantity = getString(R.string.missing_quantity);
             }
             sB.append(quantity);
 
 
-            if (measure.isEmpty()) {
+            if (TextUtils.isEmpty(measure)) {
                 sB.append(getString(R.string.missing_measure));
             } else if (!measure.equals("UNIT")) { // If it's a unit, skip it
                 // Don't add space if the measure is grams or kilos
@@ -145,7 +146,7 @@ public class StepListFragment extends Fragment {
             }
             sB.append(SPACE);
 
-            if (ingredient.isEmpty()) {
+            if (TextUtils.isEmpty(ingredient)) {
                 ingredient = getString(R.string.missing_ingredient);
             }
             sB.append(ingredient);

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,20 +74,20 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         // Retrieve recipe values
-        String imageUrl = mRecipes.get(position).getImage().trim();
-        String recipeName = mRecipes.get(position).getName().trim();
-        String servings = String.valueOf(mRecipes.get(position).getServings()).trim();
+        String imageUrl = mRecipes.get(position).getImage();
+        String recipeName = mRecipes.get(position).getName();
+        String servings = String.valueOf(mRecipes.get(position).getServings());
 
         // Check if they aren't empty, and set
-        if (!imageUrl.isEmpty()) Picasso.get().load(imageUrl).into(holder.recipePhotoIV);
+        if (!TextUtils.isEmpty(imageUrl)) Picasso.get().load(imageUrl).into(holder.recipePhotoIV);
 
-        if (!recipeName.isEmpty()) {
+        if (!TextUtils.isEmpty(recipeName)) {
             holder.recipeNameTV.setText(recipeName);
         } else {
             holder.recipeNameTV.setText(R.string.missing_recipe_name);
         }
 
-        if (!servings.isEmpty()) {
+        if (!TextUtils.isEmpty(servings)) {
             holder.recipeServingsTV.setText(mContext.getString(R.string.recipe_serves, servings));
         } else {
             holder.recipeServingsTV.setText(R.string.missing_servings);
