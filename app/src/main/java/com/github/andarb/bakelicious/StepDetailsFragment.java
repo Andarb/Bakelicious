@@ -50,6 +50,7 @@ import butterknife.Unbinder;
 public class StepDetailsFragment extends Fragment {
 
     private final static String PLAYER_POSITION = "exoplayer_seek";
+    private final static String PLAYER_STATE = "exoplayer_play_pause";
 
     @BindBool(R.bool.isTablet)
     boolean mIsTablet;
@@ -66,6 +67,7 @@ public class StepDetailsFragment extends Fragment {
     private int mRecipeStep;
     private SimpleExoPlayer mPlayer;
     private long mPlayerPosition;
+    private boolean mPlayerState;
     private Unbinder mButterknifeUnbinder;
 
     /* Required empty public constructor */
@@ -106,10 +108,12 @@ public class StepDetailsFragment extends Fragment {
             // on fragment creation. When fragment is recreated we need to restore the correct step.
             mPlayerPosition = savedInstanceState.getLong(PLAYER_POSITION, C.TIME_UNSET);
             mRecipeStep = savedInstanceState.getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
+            mPlayerState = savedInstanceState.getBoolean(PLAYER_STATE, true);
             if (mIsTablet) highlightRecipeStep();
         } else {
             mRecipeStep = getArguments().getInt(InstructionsFragmentActivity.STEP_EXTRA, 0);
             mPlayerPosition = C.TIME_UNSET; // ExoPlayer constant for unknown time
+            mPlayerState = true;
         }
 
         updateDetails(mRecipeStep);
@@ -132,20 +136,23 @@ public class StepDetailsFragment extends Fragment {
             mNextButton.setVisibility(View.VISIBLE);
         }
 
-        // Retrieve step details
-        String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL().trim();
-        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
-        String description = mRecipe.getSteps().get(mRecipeStep).getDescription().trim();
+        // Initialize the video player
+        initializePlayer();
 
-        // Initialize the video player and set step description
-        initializePlayer(getActivity(), thumbnailUrl, videoUrl);
+        // Set a detailed description for the step
+        String description = mRecipe.getSteps().get(mRecipeStep).getDescription().trim();
         if (description.isEmpty()) description = getString(R.string.missing_description);
         stepDescriptionTV.setText(description);
     }
 
 
     /* Setup ExoPlayer to play a video or show a thumbnail/placeholder */
-    private void initializePlayer(Context context, String thumbnailUrl, String videoUrl) {
+    private void initializePlayer() {
+        Context context = getActivity();
+
+        // Retrieve video and thumbnail URLs
+        String thumbnailUrl = mRecipe.getSteps().get(mRecipeStep).getThumbnailURL().trim();
+        String videoUrl = mRecipe.getSteps().get(mRecipeStep).getVideoURL().trim();
 
         // Create a default TrackSelector
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -169,13 +176,16 @@ public class StepDetailsFragment extends Fragment {
                         R.drawable.player_loading));
             }
 
-            // Prepare media player source, and start playing the video, and hide controls
+            // Prepare media player source
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
                     Util.getUserAgent(context, getString(R.string.app_name)), bandwidthMeter);
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(videoUrl));
             mPlayer.prepare(videoSource);
-            mPlayer.setPlayWhenReady(true);
+
+            // Seek to last known paused position, set play by default and hide controls
+            mPlayer.seekTo(mPlayerPosition);
+            mPlayer.setPlayWhenReady(mPlayerState);
             mPlayerView.hideController();
 
         } else {
@@ -234,15 +244,6 @@ public class StepDetailsFragment extends Fragment {
         Picasso.get().load(url).into(target);
     }
 
-    /* Release ExoPlayer resources */
-    private void releasePlayer() {
-        if (mPlayer != null) {
-            mPlayer.stop();
-            mPlayer.release();
-            mPlayer = null;
-        }
-    }
-
     /* Send a broadcast to update the highlighting of list items in StepAdapter */
     private void highlightRecipeStep() {
         Intent intent = new Intent();
@@ -271,31 +272,40 @@ public class StepDetailsFragment extends Fragment {
         updateDetails(mRecipeStep);
     }
 
+    /* Release ExoPlayer resources */
+    private void releasePlayer() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
+        }
+    }
+
     @Override
     public void onPause() {
-        // Set current position in ExoPlayer and pause
+        // Save current position and state of ExoPlayer and destroy it
         if (mPlayer != null) {
             mPlayerPosition = mPlayer.getCurrentPosition();
-            mPlayer.setPlayWhenReady(false);
+            mPlayerState = mPlayer.getPlayWhenReady();
+            releasePlayer();
         }
         super.onPause();
     }
 
     @Override
     public void onResume() {
-        // Restore previously saved position in ExoPlayer, and play
-        if (mPlayer != null) {
-            mPlayer.seekTo(mPlayerPosition);
-            mPlayer.setPlayWhenReady(true);
-        }
+        // Try to reinitialize player
+        initializePlayer();
+
         super.onResume();
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        // Save the current step of the recipe, and the video position in ExoPlayer
+        // Save the current step of the recipe, and the video position and state of ExoPlayer
         outState.putInt(InstructionsFragmentActivity.STEP_EXTRA, mRecipeStep);
         outState.putLong(PLAYER_POSITION, mPlayerPosition);
+        outState.putBoolean(PLAYER_STATE, mPlayerState);
 
         super.onSaveInstanceState(outState);
     }
@@ -304,7 +314,6 @@ public class StepDetailsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
 
-        releasePlayer();
         mButterknifeUnbinder.unbind(); // Required unbind when using Butterknife with Fragments
     }
 
