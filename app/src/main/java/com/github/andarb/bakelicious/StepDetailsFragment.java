@@ -149,6 +149,7 @@ public class StepDetailsFragment extends Fragment {
 
     /* Setup ExoPlayer to play a video or show a thumbnail/placeholder */
     private void initializePlayer() {
+        if (mPlayer != null) return;
         Context context = getActivity();
 
         // Retrieve video and thumbnail URLs
