@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.adapters;
+package com.andarb.bakelicious.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -11,9 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.github.andarb.bakelicious.R;
-import com.github.andarb.bakelicious.StepListFragment;
-import com.github.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.R;
+import com.andarb.bakelicious.StepListFragment;
+import com.andarb.bakelicious.data.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

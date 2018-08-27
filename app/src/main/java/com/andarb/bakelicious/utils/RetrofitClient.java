@@ -1,6 +1,6 @@
-package com.github.andarb.bakelicious.utils;
+package com.andarb.bakelicious.utils;
 
-import com.github.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.data.Recipe;
 
 import java.util.List;
 

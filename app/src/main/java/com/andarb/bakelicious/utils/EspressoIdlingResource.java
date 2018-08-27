@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.utils;
+package com.andarb.bakelicious.utils;
 
 import android.support.test.espresso.IdlingResource;
 

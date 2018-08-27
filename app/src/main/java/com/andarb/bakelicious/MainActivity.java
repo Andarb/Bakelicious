@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious;
+package com.andarb.bakelicious;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,11 +13,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.github.andarb.bakelicious.adapters.RecipeAdapter;
-import com.github.andarb.bakelicious.data.Recipe;
-import com.github.andarb.bakelicious.utils.EspressoIdlingResource;
-import com.github.andarb.bakelicious.utils.RetrofitClient;
-import com.github.andarb.bakelicious.widget.IngredientProvider;
+import com.andarb.bakelicious.adapters.RecipeAdapter;
+import com.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.utils.EspressoIdlingResource;
+import com.andarb.bakelicious.utils.RetrofitClient;
+import com.andarb.bakelicious.widget.IngredientProvider;
 
 import java.util.List;
 

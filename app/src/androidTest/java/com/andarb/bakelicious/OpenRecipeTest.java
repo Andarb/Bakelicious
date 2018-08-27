@@ -1,12 +1,13 @@
-package com.github.andarb.bakelicious;
+package com.andarb.bakelicious;
 
 
 import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.github.andarb.bakelicious.utils.EspressoIdlingResource;
+import com.andarb.bakelicious.utils.EspressoIdlingResource;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +17,6 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 
 /**
@@ -38,7 +38,7 @@ public class OpenRecipeTest {
 
     @Test
     public void clickRecipeItem_OpensRecipe() {
-        onView(withId(R.id.recipes_recycler_view))
+        onView(ViewMatchers.withId(com.andarb.bakelicious.R.id.recipes_recycler_view))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
     }
 

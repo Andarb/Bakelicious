@@ -1,9 +1,9 @@
-package com.github.andarb.bakelicious;
+package com.andarb.bakelicious;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.github.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.data.Recipe;
 
 import butterknife.BindBool;
 import butterknife.ButterKnife;
