@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.data;
+package com.andarb.bakelicious.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

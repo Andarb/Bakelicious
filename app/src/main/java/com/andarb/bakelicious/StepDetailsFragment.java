@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious;
+package com.andarb.bakelicious;
 
 
 import android.content.Context;
@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.data.Recipe;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;

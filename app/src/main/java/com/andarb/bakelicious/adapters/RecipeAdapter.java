@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.adapters;
+package com.andarb.bakelicious.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.andarb.bakelicious.InstructionsFragmentActivity;
-import com.github.andarb.bakelicious.R;
-import com.github.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.InstructionsFragmentActivity;
+import com.andarb.bakelicious.R;
+import com.andarb.bakelicious.data.Recipe;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

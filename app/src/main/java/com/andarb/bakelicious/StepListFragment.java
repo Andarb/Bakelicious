@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious;
+package com.andarb.bakelicious;
 
 
 import android.app.Activity;
@@ -20,10 +20,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.github.andarb.bakelicious.adapters.StepAdapter;
-import com.github.andarb.bakelicious.data.Ingredient;
-import com.github.andarb.bakelicious.data.Recipe;
-import com.github.andarb.bakelicious.widget.IngredientProvider;
+import com.andarb.bakelicious.adapters.StepAdapter;
+import com.andarb.bakelicious.data.Ingredient;
+import com.andarb.bakelicious.data.Recipe;
+import com.andarb.bakelicious.widget.IngredientProvider;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -47,7 +47,7 @@ public class StepListFragment extends Fragment {
 
     // Action for the broadcast receiver
     public static final String STEP_SELECTED_ACTION =
-            "com.github.andarb.bakelicious.RECIPE_STEP_SELECTED";
+            "com.andarb.bakelicious.RECIPE_STEP_SELECTED";
 
     // InstructionsFragmentActivity must implement this interface in order for
     // StepListFragment and StepDetailsFragment to communicate when a recipe step is clicked.

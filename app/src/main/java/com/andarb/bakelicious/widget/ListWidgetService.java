@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.widget;
+package com.andarb.bakelicious.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.github.andarb.bakelicious.R;
+import com.andarb.bakelicious.R;
 
 public class ListWidgetService extends RemoteViewsService {
     @Override

@@ -1,4 +1,4 @@
-package com.github.andarb.bakelicious.widget;
+package com.andarb.bakelicious.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -9,8 +9,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
-import com.github.andarb.bakelicious.MainActivity;
-import com.github.andarb.bakelicious.R;
+import com.andarb.bakelicious.MainActivity;
+import com.andarb.bakelicious.R;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 
